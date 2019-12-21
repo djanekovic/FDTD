@@ -1,0 +1,39 @@
+\documentclass{article}
+\usepackage{amsmath}
+
+\title{Inovativni elektromagnetski sustav - projekt}
+\author{Darko Janeković}
+
+\begin{document}
+\maketitle
+
+\section{Stabilnost BEC numeričke sheme}
+
+Za početak, potrebno je dokazati stabilnost numeričke sheme. Stabilnost
+numeričke sheme dokazuje se koristeći Von Neumannovu metodu.
+
+\begin{equation}
+    u_j^{n+1} + \frac{a \mu}{2}(u_{j+1}^{n+1} - u_{j-1}^{n+1}) = u_j^n
+\end{equation}
+
+Analiza stabilnosti koristeći Von Neumannovu metodu se temelji na provjeravanju
+amplitude harmonika na izlazu iz numeričke sheme. Uvrštavanjem k-tog harmonika u
+numeričku shemu dobiva se:
+
+\begin{gather}
+    u_j^n = \alpha_k \lambda^n e^{-i k j \Delta x} \nonumber \\
+    \alpha_k \lambda^{n+1} e^{-i k j \Delta x} + \frac{a \mu}{2}(
+        \alpha_k \lambda^{n+1} e^{-i k (j + 1) \Delta x} -
+        \alpha_k \lambda^{n+1} e^{-i k (j - 1) \Delta x}
+    ) = \alpha_k \lambda^n e^{-i k j \Delta x} \nonumber \\
+    \lambda_k + \frac{a \mu}{2}(
+        \lambda_k e^{i k \Delta x} -
+        \lambda_k e^{-i k  \Delta x}) = 1 \nonumber \\
+    \lambda_k = \frac{1}{1 + a \mu cos(k \Delta x)}
+\end{gather}
+
+Shema je stabilna ukoliko vrijedi $\lambda_k \le 1$. Lako je uočljivo da je shema
+bezuvjetno stabilna budući da za svaki $a$ odnosno $\mu$, $\lambda_k$ ne postaje
+veći od $1$.
+
+\end{document}
