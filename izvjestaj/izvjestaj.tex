@@ -9,19 +9,22 @@
 
 \section{Stabilnost BEC numeričke sheme}
 
-Za početak, potrebno je dokazati stabilnost numeričke sheme. Stabilnost
-numeričke sheme dokazuje se koristeći Von Neumannovu metodu.
-
+Za početak, potrebno je dokazati stabilnost numeričke sheme
 \begin{equation}
-    u_j^{n+1} + \frac{a \mu}{2}(u_{j+1}^{n+1} - u_{j-1}^{n+1}) = u_j^n
+    u_j^{n+1} + \frac{a \mu}{2}(u_{j+1}^{n+1} - u_{j-1}^{n+1}) = u_j^n.
 \end{equation}
 
-Analiza stabilnosti koristeći Von Neumannovu metodu se temelji na provjeravanju
-amplitude harmonika na izlazu iz numeričke sheme. Uvrštavanjem k-tog harmonika u
-numeričku shemu dobiva se:
+Stabilnost numeričke sheme dokazuje se koristeći Von Neumannovu metodu, a ona
+se temelji na provjeravanju amplitude harmonika na izlazu iz numeričke sheme.
+Uvrštavanjem k-tog harmonika
+
+\begin{equation}
+    u_j^n = \alpha_k \lambda^n e^{-i k j \Delta x}
+\end{equation}
+
+u numeričku shemu dobiva se:
 
 \begin{gather}
-    u_j^n = \alpha_k \lambda^n e^{-i k j \Delta x} \nonumber \\
     \alpha_k \lambda^{n+1} e^{-i k j \Delta x} + \frac{a \mu}{2}(
         \alpha_k \lambda^{n+1} e^{-i k (j + 1) \Delta x} -
         \alpha_k \lambda^{n+1} e^{-i k (j - 1) \Delta x}
@@ -29,11 +32,82 @@ numeričku shemu dobiva se:
     \lambda_k + \frac{a \mu}{2}(
         \lambda_k e^{i k \Delta x} -
         \lambda_k e^{-i k  \Delta x}) = 1 \nonumber \\
-    \lambda_k = \frac{1}{1 + a \mu cos(k \Delta x)}
+    \lambda_k = \frac{1}{1 + i a \mu \cdot \sin(k \Delta x)} \nonumber \\
+    \lambda_k = \frac{1 - i a \mu \cdot \sin(k \Delta x)}
+        {1 + a^2 \mu^2 \cdot \sin^2(k \Delta x)}
 \end{gather}
 
-Shema je stabilna ukoliko vrijedi $\lambda_k \le 1$. Lako je uočljivo da je shema
-bezuvjetno stabilna budući da za svaki $a$ odnosno $\mu$, $\lambda_k$ ne postaje
-veći od $1$.
+Shema je stabilna ukoliko vrijedi $|\lambda_k|^2 \le 1$.
+
+\begin{gather}
+    |\lambda_k|^2 = \frac{1}{(1 + a^2 \mu^2 \cdot \sin^2(k \Delta x))^2} +
+        \frac{a^2 \mu^2 \cdot \sin^2(k \Delta x)}
+            {(1 + a^2 \mu^2 \cdot \sin^2(k \Delta x))^2} \\
+    |\lambda_k|^2 = \frac{1}{1 + a^2 \mu^2 \cdot \sin^2(k \Delta x)}
+\end{gather}
+
+Lako je uočljivo da je shema bezuvjetno stabilna budući da za svaki $a$ odnosno
+$\mu$, $|\lambda_k|^2$ ne postaje veći od $1$.
+
+\section{Numerička disipacija i disperzija}
+
+Za izvod u nastavku zbog jednostavnosti će biti prepostavljena planarni val
+odnosno početni uvjet
+
+\begin{equation}
+    u_0(x, 0) = e^{i k x}.
+\end{equation}
+
+Uvršavajući početni uvjet u egzaktno rješenje $u(x, t) = u_0(x - at)$ gdje je
+$a$ brzina propagacije dobiva se
+
+\begin{equation}
+    u(x, t) = e^{i k x - i k a t} =
+              e^{i k j \Delta x} \cdot
+              \underbrace{e^{-i k a n \Delta t}}_{\lambda_k^n}.
+\end{equation}
+
+%TODO: izvedi \phi_k
+
+\subsection{Numerička disipacija}
+
+Savršena numerička shema imat će $|\lambda_k| \approx 1$ jer u tom slučaju neće
+doći do numeričke disipacije. Drugim riječima, što je $|\lambda_k|$ iznosom
+manji, to će numerička shema više prigušivati numeričko rješenje.
+
+Izvod reda veličine numeričke disipacije nastavlja se na izvod stabilnosti
+numeričke sheme.
+
+Potrebno je naći ovisno faktora pojačanja u ovisnosti o $\phi_k$.
+
+\begin{align*}
+    |\lambda_k|^2 &= \frac{1}{1 + a^2 \mu^2 \cdot \sin^2(\phi_k)} \\
+    &\approx 1 - a^2 \mu ^2 \cdot \sin^2(\phi_k) +
+        \left(a^2 \mu ^2 \cdot \sin^2(\phi_k)\right)^2 -
+        \left(a^2 \mu ^2 \cdot \sin^2(\phi_k)\right)^3... \\
+    &\approx 1 -
+        a^2 \mu^2 \cdot
+        \left(\phi_k^2 - \frac{1}{3} \phi_k^4 + \frac{2}{45} \phi_k^6\right) +
+        a^4 \mu^4 \cdot
+        \left(\phi_k^2 - \frac{1}{3} \phi_k^4 + \frac{2}{45} \phi_k^6\right)^2
+        - ... \\
+    &\approx 1 -
+        \left(a^2 \mu^2 \phi_k^2 - \frac{a^2 \mu^2}{3} \phi_k^4\right)
+        \left(1 - a^2 \mu^2 \phi_k^2 - \frac{a^2 \mu^2}{3} \phi_k^4\right)
+        - ... \\
+    &\approx 1 - a^2\mu^2 \phi_k^2 -
+        \left(a^4 \mu^4 + \frac{a^2 \mu^2}{3}\right) \phi_k^4
+        + \frac{2}{3} a^4 \mu^4 \phi_k^6 - \frac{1}{9}a^4 \mu^4 \phi_k^8
+        - ... \\
+    &= O\left(\phi_k^2\right)
+\end{align*}
+
+Budući da $|\lambda_k|^2$ ovisi o $\phi_k$ kvadratno, može se pisati da je
+numerička disipacija reda $\phi_k$.
+
+\begin{equation}
+    \epsilon(k) = O(\phi_k)
+\end{equation}
+
 
 \end{document}
