@@ -1,4 +1,6 @@
 \documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
 \usepackage{amsmath}
 
 \title{Inovativni elektromagnetski sustav - projekt}
@@ -49,27 +51,7 @@ Shema je stabilna ukoliko vrijedi $|\lambda_k|^2 \le 1$.
 Lako je uočljivo da je shema bezuvjetno stabilna budući da za svaki $a$ odnosno
 $\mu$, $|\lambda_k|^2$ ne postaje veći od $1$.
 
-\section{Numerička disipacija i disperzija}
-
-Za izvod u nastavku zbog jednostavnosti će biti prepostavljena planarni val
-odnosno početni uvjet
-
-\begin{equation}
-    u_0(x, 0) = e^{i k x}.
-\end{equation}
-
-Uvršavajući početni uvjet u egzaktno rješenje $u(x, t) = u_0(x - at)$ gdje je
-$a$ brzina propagacije dobiva se
-
-\begin{equation}
-    u(x, t) = e^{i k x - i k a t} =
-              e^{i k j \Delta x} \cdot
-              \underbrace{e^{-i k a n \Delta t}}_{\lambda_k^n}.
-\end{equation}
-
-%TODO: izvedi \phi_k
-
-\subsection{Numerička disipacija}
+\section{Numerička disipacija}
 
 Savršena numerička shema imat će $|\lambda_k| \approx 1$ jer u tom slučaju neće
 doći do numeričke disipacije. Drugim riječima, što je $|\lambda_k|$ iznosom
@@ -78,7 +60,8 @@ manji, to će numerička shema više prigušivati numeričko rješenje.
 Izvod reda veličine numeričke disipacije nastavlja se na izvod stabilnosti
 numeričke sheme.
 
-Potrebno je naći ovisno faktora pojačanja u ovisnosti o $\phi_k$.
+Potrebno je naći ovisnost faktora pojačanja u ovisnosti o $\phi_k$ gdje je
+$\phi_k$ fazna brzina k-tog harmonika.
 
 \begin{align*}
     |\lambda_k|^2 &= \frac{1}{1 + a^2 \mu^2 \cdot \sin^2(\phi_k)} \\
@@ -103,16 +86,19 @@ Potrebno je naći ovisno faktora pojačanja u ovisnosti o $\phi_k$.
 \end{align*}
 
 Budući da $|\lambda_k|^2$ ovisi o $\phi_k$ kvadratno, može se pisati da je
-numerička disipacija reda $\phi_k$.
+numerička disipacija reda $\phi_k$ odnosno
 
 \begin{equation}
-    \epsilon(k) = O(\phi_k)
+    \epsilon(k) = O(\phi_k).
 \end{equation}
 
-\subsection{Numerička disperzija}
+\section{Numerička disperzija}
+
+S druge strane, disperzija označava pogrešku faze numeričke sheme i kao takva
+proizlazi iz argumenta kompleksnog broja $\lambda_k$.
 
 \begin{align*}
-    \omega \Delta t &= -\arctan{(a \mu \sin(\phi_k))} \\
+    arg(\lambda_k) &= -\arctan{(a \mu \sin(\phi_k))} \\
     &\approx -a \mu \sin(\phi_k)
         + \frac{1}{3} a^3 \mu^3 \sin^3(\phi_k)
         - \frac{1}{5} a^5 \mu^5 \sin^5(\phi_k) + ... \\
@@ -120,5 +106,21 @@ numerička disipacija reda $\phi_k$.
         \left( \phi_k - \frac{1}{3!}\phi_k^3 + \frac{1}{5!}\phi_k^5 -...\right)
         + ...
 \end{align*}
+
+Relativna greška faze se onda može izraziti kao
+\begin{align*}
+    \frac{arg(\lambda_k) - (- \phi_k a \mu)}{-\phi_k a \mu} =
+        \frac{(-\phi_k + \frac{1}{3!}\phi_k^3 - ...) + \phi_k}{-\phi_k} =
+        \frac{(-1 + \frac{1}{3!}\phi_k^2 - ...) + 1}{-1} \approx
+        1 - \frac{1}{3!}\phi_k^2
+\end{align*}
+
+Odnosno pokazali smo da je relativna fazna greška reda $O(\phi_k^2)$.
+
+\section{Implementacija}
+
+Programsko rješenje problema izvedeno je u programskom jeziku Python. Kao
+vanjski modul je korištena programska biblioteka PETSc kroz modul petsc4py.
+Modul je korišten za rješavanje i spremanje sustava nepoznanica.
 
 \end{document}
