@@ -3,6 +3,7 @@ import petsc4py
 petsc4py.init(sys.argv)
 from petsc4py import PETSc
 import numpy as np
+from scipy.signal import find_peaks
 import matplotlib.pyplot as plt
 
 class Simulation():
@@ -62,19 +63,21 @@ class Simulation():
         ax = fig.add_subplot(111)
         ax.set_ylim((-1, 1))
         line1, = ax.plot(self.b.getArray())
+
         while True:
             self.ksp.solve(self.b, self.x)
             print("iterations: %d residual norm: %g" % (self.ksp.its, self.ksp.norm))
             line1.set_ydata(self.b.getArray())
             fig.canvas.draw()
             fig.canvas.flush_events()
+
             self.b = self.x
 
 
 if __name__ == "__main__":
     a = 2
     mu = 0.3
-    simulation_step = 1000
+    simulation_step = 500
 
     n = np.array(list(range(simulation_step)))
     x_data = np.where(n < 200, np.abs(np.sin(2 * np.pi * n/200)), 0)
