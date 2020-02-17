@@ -4,17 +4,42 @@ import petsc4py
 from slepc4py import SLEPc
 from petsc4py import PETSc
 import numpy as np
-import scipy
 from scipy import constants
 import matplotlib.pyplot as plt
 
+def compute_kz(x, h, eigenvalue):
+    kz2 = np.power(2 * np.pi * x/constants.c, 2) - eigenvalue / h**2
+    return np.sqrt(kz2)
+
+def plot_eigenvalue(h, eigenvalue):
+    f0 = constants.c * np.sqrt(eigenvalue)/(2 * np.pi * h)
+
+    print (" f0 = {}".format(f0))
+
+    # +1 tako da nemam negativne brojeve pod korijenom
+    x = np.linspace(f0+1, f0 + 10e9)
+    y = compute_kz(x, h, eigenvalue)
+
+
+    plt.plot(x, y)
+    plt.show()
+
 
 if __name__ == "__main__":
-    sizes = [100, 100]
+    dim = np.array([5.817, 2.903])
+    h = 0.05
+
+    sizes = (dim / h).astype(np.int64)
     dof = 1
     stencil_width = 1
     boundary_type = None
     stencil_type = PETSc.DMDA.StencilType.STAR
+
+    print ("=" * 79)
+    print (" Problem dimenzija: {} [cm]".format(dim))
+    print (" Korak diskretizacije u obje dimenzije: {}".format(h))
+    print (" Problem rezultira matricom dimenzija {}".format(sizes))
+    print ("=" * 79)
 
     dmda = PETSc.DMDA().create(dim = len(sizes),
                                dof = dof,
@@ -28,7 +53,6 @@ if __name__ == "__main__":
     (xs, xe), (ys, ye) = dmda.getRanges()
     _, (xsize, ysize) = dmda.getCorners()
 
-    h = 1/ysize
     diag = 4
 
     for y in range(ys, ye):
@@ -62,19 +86,25 @@ if __name__ == "__main__":
     print ("=" * 79)
     print ("    Našao {} svojstvene vrijednosti".format(E.getConverged()))
     print ("=" * 79)
+    eigenvalues = []
     for i in range(E.getConverged()):
         k = E.getEigenpair(i, xr, xi)
         error = E.computeError(i)
-        if k.imag != 0.0:
-            print ("{}+{}i {}".format(k.real, k.imag, error))
-        else:
-            print (k.real, error)
+        assert k.imag == 0.0, "Svojstvene vrijednosti nisu realne!"
 
-        x = np.linspace(-1, 1, xsize)
-        y = np.linspace(-1, 1, ysize)
+        print (" {}. Svojstvena vrijednost {}, greska {}".format(
+                i+1, k.real, error))
+
+        x = np.linspace(0, dim[0], sizes[0])
+        y = np.linspace(0, dim[1], sizes[1])
         z = xr.getArray()
-        Z = z.reshape(xsize, ysize)
-        X, Y = np.meshgrid(x, y)
 
-        plt.contourf(X, Y, Z, 10)
+        Z = z.reshape(sizes[1], sizes[0])
+        X, Y = np.meshgrid(x, y)
+        plt.contourf(X, Y, Z, 100)
         plt.show()
+
+        eigenvalues.append(k.real)
+
+    plot_eigenvalue(h, eigenvalues[0])
+    plot_eigenvalue(h, eigenvalues[1])
