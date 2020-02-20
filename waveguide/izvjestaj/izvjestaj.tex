@@ -1,0 +1,76 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\graphicspath{ {./images/} }
+
+\title{Inovativni elektromagnetski sustavi - projekt}
+\author{Darko Janeković}
+
+\begin{document}
+\maketitle
+
+\section{Implementacija}
+Rješenje zadatka implementirano je u programskom jeziku Python 3 koristeći
+vanjske biblioteke PETSc i SLEPc. Programska biblioteka PETSc koristi se za
+općenite podatkovne strukture potrebne za efikasno rješavanje problema. S druge
+strane SLEPc se koristi za rješavanje svojstvenog problema.
+
+Skripta za rješavanje problema traži postavljanje dva parametra:
+\begin{itemize}
+    \item \texttt{dim} - Dimenzije valovoda u centimetrima. Primjerice za
+modeliranje WR229 valovoda potrebno je postaviti:
+    \texttt{dim = np.array([5.817, 2.903])}.
+    \item \texttt{h} - Korak diskretizacije u centrimetrima. Korak
+diskretizacije označava najmanji korak mreže u okviru metode konačnih razlika.
+\end{itemize}
+
+Program će na početku svog rada stvoriti podatkovne strukture. Na prvom
+mjestu to je objekt \texttt{DMDA} koji brine o ispravnoj prealokaciji rijetko
+popunjene matrice te o ispravnoj distribuciji problema u slučaju
+implementacije paralelnog izvođenja (zbog jednostavnosti, ovdje to nije
+korišteno).
+
+Nakon stvaranja i popunjavanja matrice, potrebno je stvoriti objekt
+\texttt{EPS} koji rješava svojstveni problem. Nakon što su svojstvene
+vrijednosti i vektori pronađeni program radi nekoliko stvari:
+\begin{itemize}
+    \item Ispisuje svojstvenu vrijednost i pripadajuću grešku.
+    \item Sprema grafički prikaz razdiobe $z$ komponente električnog polja.
+    \item Računa frekvenciju $f_0$ pri kojoj mod počinje propagirati.
+    \item Sprema grafički prikaz $k_z(f)$ za sve izračunate svojstvene vrijednosti.
+\end{itemize}
+
+\section{Demonstracija pokretanja}
+
+U ispisu u nastavku prikazano je pokretanje skripte. Grafički prikazi razdiobe
+polja su spremljeni u trenutnom direktoriju.
+
+\begin{verbatim}
+$ python3 waveguide.py
+=============================================================================
+ Problem dimenzija: [5.817 2.903] [cm]
+ Korak diskretizacije u obje dimenzije: 0.05
+ Problem rezultira matricom dimenzija [116  58]
+=============================================================================
+ 1. Svojstvena vrijednost 0.003783204609551006, greška 7.937783972117381e-09
+ 2. Svojstvena vrijednost 0.0060213601677123925, greška 8.009617064752424e-09
+ 3. Svojstvena vrijednost 0.009749763612308877, greška 4.700250058685318e-10
+ f0 = 58694951.12414197 Hz
+ f0 = 74048818.405483 Hz
+ f0 = 94225374.73295589 Hz
+\end{verbatim}
+
+\section{Rezultati}
+
+U nastavku su prikazani rezultati ranije prikazanog pokretanja skripte.
+
+\begin{figure}[h]
+    \includegraphics[width=7cm]{mod_0.pdf}
+    \includegraphics[width=7cm]{mod_1.pdf}
+    \includegraphics[width=7cm]{mod_2.pdf}
+    \includegraphics[width=7cm]{kz.pdf}
+\end{figure}
+
+\end{document}
