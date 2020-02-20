@@ -130,6 +130,10 @@ if __name__ == "__main__":
     E.setOperators(A)
     # matrica nije hermitska zbog rubnih uvjeta
     E.setProblemType(SLEPc.EPS.ProblemType.NHEP)
+    # vrati 3 svojstvene vrijednosti
+    E.setDimensions(3, PETSc.DECIDE, PETSc.DECIDE)
+    # prvo najmanja pa onda veće
+    E.setWhichEigenpairs(SLEPc.EPS.Which.SMALLEST_MAGNITUDE)
     E.setFromOptions()
     E.solve()
 
@@ -146,7 +150,7 @@ if __name__ == "__main__":
                 i+1, k.real, error))
 
         plot_eigenfunction(dim, sizes, xr)
-        plt.show()
+        plt.savefig("mod_" + str(i) + ".pdf", bbox_inches='tight')
         eigenvalues.append(k.real)
 
     plot_kz(h, eigenvalues[0], "m=1, n=1")
@@ -154,4 +158,4 @@ if __name__ == "__main__":
     plot_kz(h, eigenvalues[2], "m=3, n=1")
 
     plt.legend()
-    plt.show()
+    plt.savefig('kz.pdf', bbox_inches='tight')
